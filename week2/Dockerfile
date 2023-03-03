@@ -9,5 +9,5 @@ RUN mkdir -p /opt/prefect/data/
 RUN mkdir -p /opt/prefect/data/yellow
 RUN mkdir -p /opt/prefect/flows
 
-COPY . /opt/prefect/flows
+COPY . /opt/prefect/flows/week2
 

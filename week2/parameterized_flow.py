@@ -80,8 +80,9 @@ def etl_parent_flow(
                     except:
                         print("some error occured")
                         continue
+
 if __name__ == '__main__':
-    color = ["yellow"]
-    months = [12,11,10,9,8,7,6,5,4,3,2,1]
-    year = [2020,2019]
-    etl_parent_flow(months, year, color)
+    colors = ["yellow"]
+    months = [3,2]
+    years = [2019]
+    etl_parent_flow(months, years, colors)
