@@ -35,7 +35,11 @@ def clean(df: pd.DataFrame, color: str) -> pd.DataFrame:
 @task()
 def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
     """"Write DataFrame out locally as parquet file"""
-    path = Path(f"data/{color}/{dataset_file}.parquet")
+    locdir = Path(f"data/{color}")
+    filename = f"{dataset_file}.parquet"
+    if not Path.exists(locdir):
+        Path.mkdir(locdir)
+    path = Path(f"{locdir}/{filename}")
     df.to_parquet(path, compression="gzip")
     return path
 
