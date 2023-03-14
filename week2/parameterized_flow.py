@@ -20,17 +20,43 @@ def fetch(dataset_url: str) -> pd.DataFrame:
 @task(log_prints=True)
 def clean(df: pd.DataFrame, color: str) -> pd.DataFrame:
     """Fix dtype issues"""
-    if color == 'green':
-        df['lpep_pickup_datetime'] = pd.to_datetime(df['lpep_pickup_datetime'])
-        df['lpep_dropoff_datetime'] = pd.to_datetime(df['lpep_dropoff_datetime'])
-    else:
-        df['tpep_pickup_datetime'] = pd.to_datetime(df['tpep_pickup_datetime'])
-        df['tpep_dropoff_datetime'] = pd.to_datetime(df['tpep_dropoff_datetime'])
+    if color == "yellow":
+        """Fix dtype issues"""
+        df["tpep_pickup_datetime"] = pd.to_datetime(df["tpep_pickup_datetime"])
+        df["tpep_dropoff_datetime"] = pd.to_datetime(df["tpep_dropoff_datetime"])
+
+    if color == "green":
+        """Fix dtype issues"""
+        df["lpep_pickup_datetime"] = pd.to_datetime(df["lpep_pickup_datetime"])
+        df["lpep_dropoff_datetime"] = pd.to_datetime(df["lpep_dropoff_datetime"])
+        df["trip_type"] = df["trip_type"].astype('Int64')
+
+    if color == "yellow" or color == "green":
+        df["VendorID"] = df["VendorID"].astype('Int64')
+        df["RatecodeID"] = df["RatecodeID"].astype('Int64')
+        df["PULocationID"] = df["PULocationID"].astype('Int64')
+        df["DOLocationID"] = df["DOLocationID"].astype('Int64')
+        df["passenger_count"] = df["passenger_count"].astype('Int64')
+        df["payment_type"] = df["payment_type"].astype('Int64')
+
+    if color == "fhv":
+        """Rename columns"""
+        df.rename({'dropoff_datetime':'dropOff_datetime'}, axis='columns', inplace=True)
+        df.rename({'PULocationID':'PUlocationID'}, axis='columns', inplace=True)
+        df.rename({'DOLocationID':'DOlocationID'}, axis='columns', inplace=True)
+
+        """Fix dtype issues"""
+        df["pickup_datetime"] = pd.to_datetime(df["pickup_datetime"])
+        df["dropOff_datetime"] = pd.to_datetime(df["dropOff_datetime"])
+        df["PUlocationID"] = df["PUlocationID"].astype('Int64')
+        df["DOlocationID"] = df["DOlocationID"].astype('Int64')
+
     print(df.head(2))
     print(f"columns: {df.dtypes}")
     print(f"rows: {len(df)}")
     return df
 
+    
 
 @task()
 def write_local(df: pd.DataFrame, color: str, dataset_file: str) -> Path:
@@ -65,12 +91,6 @@ def etl_web_to_gcs(year: int, month: int, color: str) -> None:
     path = write_local(df_clean, color, dataset_file)
     write_gcs(path)
     
-# @flow()
-# def etl_parent_flow(
-#     months: list[int] = [1, 2], year: int = 2021, color: str = "yellow"):
-    
-#     for month in months:
-#         etl_web_to_gcs(year, month, color)
 
 @flow()
 def etl_parent_flow(
@@ -86,7 +106,7 @@ def etl_parent_flow(
                         continue
 
 if __name__ == '__main__':
-    colors = ["yellow"]
-    months = [3,2]
-    years = [2019]
+    colors = ["green"]
+    months = [1,2,3,4,5,6,7,8,9,10,11,12]
+    years = [2019,2020]
     etl_parent_flow(months, years, colors)
